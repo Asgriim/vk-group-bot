@@ -102,19 +102,24 @@ public class App {
                     }
                     if(postsCount % asDuration == 0){
                         artStationPost = databaseManager.getTopOfArtStation();
-                        files = saveAsFiles(
-                                "as" + artStationPost.getId() + "_%d.jpg",
-                                artStationPost.getAttachments()
-                        );
-                        mes = artStationPost.getTags() + "\n" + "by " + artStationPost.getArtist() + "\n#artSt@" + strId;
-                        bot.postPhotosOnWall(files,
-                                databaseManager.nextPostTime(),
-                                mes,
-                                "сурс: " + artStationPost.getPermalink(),
-                                reqInterval);
-                        deleteFiles(files);
+                        try {
+                            files = saveAsFiles(
+                                    "as" + artStationPost.getId() + "_%d.jpg",
+                                    artStationPost.getAttachments()
+                            );
+                            mes = artStationPost.getTags() + "\n" + "by " + artStationPost.getArtist() + "\n#artSt@" + strId;
+                            bot.postPhotosOnWall(files,
+                                    databaseManager.nextPostTime(),
+                                    mes,
+                                    "сурс: " + artStationPost.getPermalink(),
+                                    reqInterval);
+                            logger.info(Thread.currentThread().getName() + " posted artSt");
+                            deleteFiles(files);
+                        }catch (IOException e){
+                            logger.log(Level.SEVERE,"ERROR: " , e);
+                        }
                         databaseManager.deleteFromDB("artStation",artStationPost.getPermalink());
-                        logger.info(Thread.currentThread().getName() + " posted artSt");
+
                     }
                     else {
                         String fileName = "";
@@ -122,39 +127,48 @@ public class App {
                         redditPost = databaseManager.getTopOfReddit();
                         if (redditPost.getAttachments().get(0).contains(".jpg")) {
                             fileName = "reddit" + redditPost.getId() + "_%d.jpg";
-                            files = saveAsFiles(
-                                    fileName,
-                                    redditPost.getAttachments()
-                            );
-                            bot.postPhotosOnWall(
-                                    files,
-                                    databaseManager.nextPostTime(),
-                                    mes,
-                                    "сурс: " + redditPost.getPermalink(),
-                                    reqInterval
-                            );
-                            deleteFiles(files);
+                            try {
+                                files = saveAsFiles(
+                                        fileName,
+                                        redditPost.getAttachments()
+                                );
+                                bot.postPhotosOnWall(
+                                        files,
+                                        databaseManager.nextPostTime(),
+                                        mes,
+                                        "сурс: " + redditPost.getPermalink(),
+                                        reqInterval
+                                );
+                                logger.info(Thread.currentThread().getName() + " posted reddit");
+                                deleteFiles(files);
+                            }catch (IOException e){
+                                logger.log(Level.SEVERE,"ERROR: " , e);
+                            }
+
                         }
-                        else if (redditPost.getAttachments().get(0).contains(".gif")){
+                        else if (redditPost.getAttachments().get(0).contains(".gif")) {
                             fileName = "reddit" + redditPost.getId() + "_%d.gif";
-                            fileName = "reddit" + redditPost.getId() + "_%d.jpg";
-                            files = saveAsFiles(
-                                    fileName,
-                                    redditPost.getAttachments()
-                            );
-                            bot.postDocOnwall(files.get(0),groupName + "_" + redditPost.getId(),
-                                    databaseManager.nextPostTime(),
-                                    mes,
-                                    reqInterval);
-                            deleteFiles(files);
+                            try {
+                                files = saveAsFiles(
+                                        fileName,
+                                        redditPost.getAttachments()
+                                );
+                                bot.postDocOnwall(files.get(0), groupName + "_" + redditPost.getId(),
+                                        databaseManager.nextPostTime(),
+                                        mes,
+                                        reqInterval);
+                                logger.info(Thread.currentThread().getName() + " posted reddit");
+                                deleteFiles(files);
+                            }catch (IOException e){
+                                logger.log(Level.SEVERE,"ERROR: " , e);
+                            }
                         }
                         databaseManager.deleteFromDB("reddit",redditPost.getPermalink());
-                        logger.info(Thread.currentThread().getName() + " posted reddit");
                     }
                     postsCount += 1;
                     logger.info(Thread.currentThread().getName() + " going to sleep for " + afterPostRest + " seconds");
                     TimeUnit.SECONDS.sleep(afterPostRest);
-                } catch (ClientException | ApiException | SQLException | InterruptedException | IOException |
+                } catch (ClientException | ApiException | SQLException | InterruptedException |
                          EmptyTableException e) {
                     logger.log(Level.SEVERE,"ERROR: " , e);
                     try {
