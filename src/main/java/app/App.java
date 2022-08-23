@@ -222,6 +222,7 @@ public class App {
                 try {
                     if ((Instant.now().getEpochSecond() - startTime) >= 3500) {
                         redditParser.setAuthToken(redditParser.getAuthToken());
+                        startTime = Instant.now().getEpochSecond();
                     }
                     if (redditParser.next()) {
                         // TODO: 02.08.2022 refactor later
