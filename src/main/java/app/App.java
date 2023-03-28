@@ -242,7 +242,7 @@ public class App {
                         title = redditParser.getTitle();
                         score = redditParser.getScore();
                         attachment = redditParser.getAttachmentLink();
-                        if((!attachment.contains(".jpg") && !attachment.contains(".gif")) || databaseManager.isInGarbage(permalink) || Integer.parseInt(score) < minScore)
+                        if((!attachment.endsWith(".jpg") && !attachment.endsWith(".gif")) || databaseManager.isInGarbage(permalink) || Integer.parseInt(score) < minScore)
                             continue;
                         databaseManager.insertToReddit(title,score,permalink,attachment);
                         logger.info(Thread.currentThread().getName() + " inserted reddit post in db: " + permalink);
